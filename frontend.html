@@ -1,0 +1,268 @@
+import java.util.*;
+
+public class MusicStreamingPlatformMenuAllOptions {
+
+    enum Role { ADMIN, ARTIST, LISTENER }
+
+    static String[] genres = {
+        "Pop", "Rock", "Hip Hop", "Jazz", "Classical", "Electronic", "R&B",
+        "Country", "Blues", "Reggae", "Metal", "Folk", "Soul", "Funk", "EDM",
+        "Indie", "Bollywood", "World", "Gospel"
+    };
+
+    static class User {
+        String name, email;
+        Role role;
+        public User(String name, String email, Role role) {
+            this.name = name;
+            this.email = email;
+            this.role = role;
+        }
+    }
+
+    static class Music {
+        String title, artist, album, genre;
+        boolean approved;
+        public Music(String title, String artist, String album, String genre) {
+            this.title = title;
+            this.artist = artist;
+            this.album = album;
+            this.genre = genre;
+            this.approved = false;
+        }
+        public String toString() {
+            return title + " | " + artist + " | " + album + " | " + genre + (approved ? " | Approved" : " | Not approved");
+        }
+    }
+
+    static class Playlist {
+        String title;
+        List<Music> songs = new ArrayList<>();
+        public Playlist(String title) { this.title = title; }
+        public void addSong(Music song) { songs.add(song); }
+        public String toString() {
+            StringBuilder sb = new StringBuilder(title + ": ");
+            for (Music m : songs) sb.append(m.title + ", ");
+            return sb.toString();
+        }
+    }
+
+    static class Platform {
+        List<User> users = new ArrayList<>();
+        List<Music> musicContents = new ArrayList<>();
+        List<Playlist> playlists = new ArrayList<>();
+        
+        String manageUser(String name, String email, Role role, String action) {
+            switch (action) {
+                case "create":
+                    users.add(new User(name, email, role));
+                    return "User created successfully";
+                case "update":
+                    for (User user : users)
+                        if (user.email.equals(email)) {
+                            user.name = name; user.role = role;
+                            return "User updated successfully";
+                        }
+                    return "User not found";
+                case "delete":
+                    return users.removeIf(user -> user.email.equals(email))
+                        ? "User deleted successfully" : "User not found";
+                default: return "Invalid action";
+            }
+        }
+
+        String uploadMusic(String title, String artist, String album, String genre) {
+            musicContents.add(new Music(title, artist, album, genre));
+            return "Music uploaded successfully";
+        }
+
+        String approveMusic(String title, boolean approve) {
+            for (Music music : musicContents)
+                if (music.title.equals(title)) {
+                    music.approved = approve;
+                    return approve ? "Music approved" : "Music rejected";
+                }
+            return "Music not found";
+        }
+
+        String streamMusic(String title) {
+            for (Music music : musicContents)
+                if (music.title.equals(title) && music.approved)
+                    return "Streaming: " + title + " by " + music.artist;
+            return "Music not available";
+        }
+
+        Playlist createPlaylist(String title) {
+            Playlist p = new Playlist(title); playlists.add(p); return p;
+        }
+
+        String followArtist(String artistName) {
+            return "Now following artist: " + artistName;
+        }
+
+        void showMusic() {
+            if (musicContents.isEmpty()) {
+                System.out.println("No music uploaded.");
+            } else {
+                for (Music m : musicContents) {
+                    System.out.println(m.toString());
+                }
+            }
+        }
+
+        void showPlaylists() {
+            if (playlists.isEmpty()) {
+                System.out.println("No playlists created.");
+            } else {
+                for (Playlist p : playlists) {
+                    System.out.println(p.toString());
+                }
+            }
+        }
+    }
+
+    // genre selection helper
+    static String selectGenre(Scanner sc) {
+        System.out.println("Choose music genre:");
+        for (int i = 0; i < genres.length; i++) {
+            System.out.println((i+1) + ". " + genres[i]);
+        }
+        System.out.print("Enter genre number: ");
+        int genreOption = sc.nextInt();
+        sc.nextLine(); // consume newline
+        if (genreOption >= 1 && genreOption <= genres.length) {
+            return genres[genreOption-1];
+        } else {
+            return "Other";
+        }
+    }
+
+    public static void main(String[] args) {
+        Platform platform = new Platform();
+        Scanner sc = new Scanner(System.in);
+
+        // Show all options at the start
+        System.out.println("====================================");
+        System.out.println("ALL USER OPTIONS:");
+        System.out.println("------------------------------------");
+        System.out.println("ADMIN OPTIONS");
+        System.out.println("  1. Create user");
+        System.out.println("  2. Update user");
+        System.out.println("  3. Delete user");
+        System.out.println("  4. Approve music");
+        System.out.println("------------------------------------");
+        System.out.println("ARTIST OPTIONS");
+        System.out.println("  5. Upload music");
+        System.out.println("  6. Interact with fans");
+        System.out.println("  7. Track music performance");
+        System.out.println("------------------------------------");
+        System.out.println("LISTENER OPTIONS");
+        System.out.println("  8. Stream music");
+        System.out.println("  9. Create playlist");
+        System.out.println(" 10. Add music to playlist");
+        System.out.println(" 11. Follow artist");
+        System.out.println("====================================");
+
+        while (true) {
+            System.out.print("\nSelect your role (ADMIN, ARTIST, LISTENER, or type EXIT): ");
+            String roleStr = sc.nextLine().trim().toUpperCase();
+            if (roleStr.equals("EXIT")) break;
+            Role role = Role.valueOf(roleStr);
+
+            System.out.print("Select an option (number from above, 0 to exit): ");
+            int option = sc.nextInt();
+            sc.nextLine(); // Consume newline
+
+            if (option == 0) break;
+
+            switch (option) {
+                case 1: // Admin - Create user
+                    System.out.print("Enter user details (name email role): ");
+                    String name1 = sc.next(); String email1 = sc.next(); String r1 = sc.next();
+                    System.out.println(platform.manageUser(name1, email1, Role.valueOf(r1.toUpperCase()), "create"));
+                    sc.nextLine();
+                    break;
+                case 2: // Admin - Update user
+                    System.out.print("Enter user details to update (name email role): ");
+                    String name2 = sc.next(); String email2 = sc.next(); String r2 = sc.next();
+                    System.out.println(platform.manageUser(name2, email2, Role.valueOf(r2.toUpperCase()), "update"));
+                    sc.nextLine();
+                    break;
+                case 3: // Admin - Delete user
+                    System.out.print("Enter user email to delete: ");
+                    String email3 = sc.next();
+                    System.out.println(platform.manageUser("", email3, null, "delete"));
+                    sc.nextLine();
+                    break;
+                case 4: // Admin - Approve music
+                    System.out.print("Approve music (title): ");
+                    String title4 = sc.nextLine();
+                    System.out.println(platform.approveMusic(title4, true));
+                    break;
+                case 5: // Artist - Upload music
+                    System.out.print("Upload music (title album): ");
+                    String title5 = sc.next(); String album5 = sc.next();
+                    String genre5 = selectGenre(sc);
+                    System.out.println(platform.uploadMusic(title5, "ArtistName", album5, genre5));
+                    sc.nextLine();
+                    break;
+                case 6: // Artist - Interact with fans
+                    System.out.print("Interact with fans - enter message: ");
+                    String msg6 = sc.nextLine();
+                    System.out.println("Interaction sent: " + msg6);
+                    break;
+                case 7: // Artist - Track music performance
+                    System.out.print("Enter music title to track performance: ");
+                    String trackTitle7 = sc.nextLine();
+                    System.out.println("Performance for " + trackTitle7 + ": Streams - 1000, Likes - 500");
+                    break;
+                case 8: // Listener - Stream music
+                    System.out.print("Stream music (title): ");
+                    String title8 = sc.nextLine();
+                    System.out.println(platform.streamMusic(title8));
+                    break;
+                case 9: // Listener - Create playlist
+                    System.out.print("Create playlist (title): ");
+                    String playlistTitle9 = sc.nextLine();
+                    Playlist p9 = platform.createPlaylist(playlistTitle9);
+                    System.out.print("Add music to playlist (title): ");
+                    String songTitle9 = sc.nextLine();
+                    for (Music m : platform.musicContents)
+                        if (m.title.equals(songTitle9)) { p9.addSong(m); break; }
+                    System.out.println("Added " + songTitle9 + " to playlist " + playlistTitle9);
+                    break;
+                case 10: // Listener - Add music to playlist
+                    System.out.print("Enter playlist title: ");
+                    String plTitle10 = sc.nextLine();
+                    System.out.print("Enter music title to add: ");
+                    String songTitle10 = sc.nextLine();
+                    for (Playlist plist : platform.playlists) {
+                        if (plist.title.equals(plTitle10)) {
+                            for (Music m : platform.musicContents) {
+                                if (m.title.equals(songTitle10)) {
+                                    plist.addSong(m);
+                                    System.out.println("Added " + songTitle10 + " to playlist " + plTitle10);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 11: // Listener - Follow artist
+                    System.out.print("Follow artist (name): ");
+                    String aName11 = sc.nextLine();
+                    System.out.println(platform.followArtist(aName11));
+                    break;
+                default: System.out.println("Invalid option!");
+            }
+
+            // Show added music and playlists after each round for easy debugging
+            System.out.println("\nCurrent Music List:");
+            platform.showMusic();
+            System.out.println("\nCurrent Playlists:");
+            platform.showPlaylists();
+        }
+        System.out.println("Exited. Thank you!");
+        sc.close();
+    }
+} give me a ui ux code in html for above code
