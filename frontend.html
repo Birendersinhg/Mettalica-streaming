@@ -1,268 +1,223 @@
-import java.util.*;
-
-public class MusicStreamingPlatformMenuAllOptions {
-
-    enum Role { ADMIN, ARTIST, LISTENER }
-
-    static String[] genres = {
-        "Pop", "Rock", "Hip Hop", "Jazz", "Classical", "Electronic", "R&B",
-        "Country", "Blues", "Reggae", "Metal", "Folk", "Soul", "Funk", "EDM",
-        "Indie", "Bollywood", "World", "Gospel"
-    };
-
-    static class User {
-        String name, email;
-        Role role;
-        public User(String name, String email, Role role) {
-            this.name = name;
-            this.email = email;
-            this.role = role;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Metallica Music Streaming</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0f0f0f;
+            font-family: Arial;
+            color: white;
         }
-    }
-
-    static class Music {
-        String title, artist, album, genre;
-        boolean approved;
-        public Music(String title, String artist, String album, String genre) {
-            this.title = title;
-            this.artist = artist;
-            this.album = album;
-            this.genre = genre;
-            this.approved = false;
+        header {
+            padding: 20px;
+            background: #181818;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #00eaff;
         }
-        public String toString() {
-            return title + " | " + artist + " | " + album + " | " + genre + (approved ? " | Approved" : " | Not approved");
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            max-width: 900px;
         }
-    }
-
-    static class Playlist {
-        String title;
-        List<Music> songs = new ArrayList<>();
-        public Playlist(String title) { this.title = title; }
-        public void addSong(Music song) { songs.add(song); }
-        public String toString() {
-            StringBuilder sb = new StringBuilder(title + ": ");
-            for (Music m : songs) sb.append(m.title + ", ");
-            return sb.toString();
+        .card {
+            background: #1c1c1c;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px #0099ff50;
         }
-    }
+        h2 {
+            color: #00eaff;
+        }
+        label {
+            font-size: 16px;
+        }
+        select, input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+        }
+        button {
+            background: #00eaff;
+            color: black;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        button:hover {
+            background: #008bbf;
+        }
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #ffde59;
+        }
+        .hidden { display: none; }
+    </style>
 
-    static class Platform {
-        List<User> users = new ArrayList<>();
-        List<Music> musicContents = new ArrayList<>();
-        List<Playlist> playlists = new ArrayList<>();
-        
-        String manageUser(String name, String email, Role role, String action) {
-            switch (action) {
-                case "create":
-                    users.add(new User(name, email, role));
-                    return "User created successfully";
-                case "update":
-                    for (User user : users)
-                        if (user.email.equals(email)) {
-                            user.name = name; user.role = role;
-                            return "User updated successfully";
-                        }
-                    return "User not found";
-                case "delete":
-                    return users.removeIf(user -> user.email.equals(email))
-                        ? "User deleted successfully" : "User not found";
-                default: return "Invalid action";
+    <script>
+        function showSection() {
+            document.querySelectorAll(".feature-section").forEach(sec => sec.classList.add("hidden"));
+            const val = document.getElementById("optionSelect").value;
+            if (val !== "0") {
+                document.getElementById("sec" + val).classList.remove("hidden");
             }
         }
+    </script>
+</head>
 
-        String uploadMusic(String title, String artist, String album, String genre) {
-            musicContents.add(new Music(title, artist, album, genre));
-            return "Music uploaded successfully";
-        }
+<body>
 
-        String approveMusic(String title, boolean approve) {
-            for (Music music : musicContents)
-                if (music.title.equals(title)) {
-                    music.approved = approve;
-                    return approve ? "Music approved" : "Music rejected";
-                }
-            return "Music not found";
-        }
+<header>Metallica Music Streaming</header>
 
-        String streamMusic(String title) {
-            for (Music music : musicContents)
-                if (music.title.equals(title) && music.approved)
-                    return "Streaming: " + title + " by " + music.artist;
-            return "Music not available";
-        }
+<div class="container">
 
-        Playlist createPlaylist(String title) {
-            Playlist p = new Playlist(title); playlists.add(p); return p;
-        }
+    <!-- ROLE SELECTION -->
+    <div class="card">
+        <h2>Select Your Role</h2>
+        <label>Select Role:</label>
+        <select id="roleSelect">
+            <option value="ADMIN">ADMIN</option>
+            <option value="ARTIST">ARTIST</option>
+            <option value="LISTENER">LISTENER</option>
+        </select>
+    </div>
 
-        String followArtist(String artistName) {
-            return "Now following artist: " + artistName;
-        }
+    <!-- OPTION SELECTOR -->
+    <div class="card">
+        <h2>Choose Option</h2>
 
-        void showMusic() {
-            if (musicContents.isEmpty()) {
-                System.out.println("No music uploaded.");
-            } else {
-                for (Music m : musicContents) {
-                    System.out.println(m.toString());
-                }
-            }
-        }
+        <select id="optionSelect" onchange="showSection()">
+            <option value="0">-- Select an option --</option>
 
-        void showPlaylists() {
-            if (playlists.isEmpty()) {
-                System.out.println("No playlists created.");
-            } else {
-                for (Playlist p : playlists) {
-                    System.out.println(p.toString());
-                }
-            }
-        }
-    }
+            <optgroup label="ADMIN">
+                <option value="1">1. Create User</option>
+                <option value="2">2. Update User</option>
+                <option value="3">3. Delete User</option>
+                <option value="4">4. Approve Music</option>
+            </optgroup>
 
-    // genre selection helper
-    static String selectGenre(Scanner sc) {
-        System.out.println("Choose music genre:");
-        for (int i = 0; i < genres.length; i++) {
-            System.out.println((i+1) + ". " + genres[i]);
-        }
-        System.out.print("Enter genre number: ");
-        int genreOption = sc.nextInt();
-        sc.nextLine(); // consume newline
-        if (genreOption >= 1 && genreOption <= genres.length) {
-            return genres[genreOption-1];
-        } else {
-            return "Other";
-        }
-    }
+            <optgroup label="ARTIST">
+                <option value="5">5. Upload Music</option>
+                <option value="6">6. Interact with Fans</option>
+                <option value="7">7. Track Music Performance</option>
+            </optgroup>
 
-    public static void main(String[] args) {
-        Platform platform = new Platform();
-        Scanner sc = new Scanner(System.in);
+            <optgroup label="LISTENER">
+                <option value="8">8. Stream Music</option>
+                <option value="9">9. Create Playlist</option>
+                <option value="10">10. Add Music to Playlist</option>
+                <option value="11">11. Follow Artist</option>
+            </optgroup>
+        </select>
+    </div>
 
-        // Show all options at the start
-        System.out.println("====================================");
-        System.out.println("ALL USER OPTIONS:");
-        System.out.println("------------------------------------");
-        System.out.println("ADMIN OPTIONS");
-        System.out.println("  1. Create user");
-        System.out.println("  2. Update user");
-        System.out.println("  3. Delete user");
-        System.out.println("  4. Approve music");
-        System.out.println("------------------------------------");
-        System.out.println("ARTIST OPTIONS");
-        System.out.println("  5. Upload music");
-        System.out.println("  6. Interact with fans");
-        System.out.println("  7. Track music performance");
-        System.out.println("------------------------------------");
-        System.out.println("LISTENER OPTIONS");
-        System.out.println("  8. Stream music");
-        System.out.println("  9. Create playlist");
-        System.out.println(" 10. Add music to playlist");
-        System.out.println(" 11. Follow artist");
-        System.out.println("====================================");
+    <!-- ====================== SECTIONS ========================== -->
 
-        while (true) {
-            System.out.print("\nSelect your role (ADMIN, ARTIST, LISTENER, or type EXIT): ");
-            String roleStr = sc.nextLine().trim().toUpperCase();
-            if (roleStr.equals("EXIT")) break;
-            Role role = Role.valueOf(roleStr);
+    <!-- 1. Create user -->
+    <div id="sec1" class="card feature-section hidden">
+        <div class="section-title">Create User</div>
+        <input type="text" placeholder="Enter Name">
+        <input type="email" placeholder="Enter Email">
+        <input type="text" placeholder="Enter Role (ADMIN / ARTIST / LISTENER)">
+        <button>Create User</button>
+    </div>
 
-            System.out.print("Select an option (number from above, 0 to exit): ");
-            int option = sc.nextInt();
-            sc.nextLine(); // Consume newline
+    <!-- 2. Update user -->
+    <div id="sec2" class="card feature-section hidden">
+        <div class="section-title">Update User</div>
+        <input type="text" placeholder="Enter New Name">
+        <input type="email" placeholder="Enter Email">
+        <input type="text" placeholder="New Role">
+        <button>Update User</button>
+    </div>
 
-            if (option == 0) break;
+    <!-- 3. Delete user -->
+    <div id="sec3" class="card feature-section hidden">
+        <div class="section-title">Delete User</div>
+        <input type="email" placeholder="Enter Email to Delete">
+        <button>Delete User</button>
+    </div>
 
-            switch (option) {
-                case 1: // Admin - Create user
-                    System.out.print("Enter user details (name email role): ");
-                    String name1 = sc.next(); String email1 = sc.next(); String r1 = sc.next();
-                    System.out.println(platform.manageUser(name1, email1, Role.valueOf(r1.toUpperCase()), "create"));
-                    sc.nextLine();
-                    break;
-                case 2: // Admin - Update user
-                    System.out.print("Enter user details to update (name email role): ");
-                    String name2 = sc.next(); String email2 = sc.next(); String r2 = sc.next();
-                    System.out.println(platform.manageUser(name2, email2, Role.valueOf(r2.toUpperCase()), "update"));
-                    sc.nextLine();
-                    break;
-                case 3: // Admin - Delete user
-                    System.out.print("Enter user email to delete: ");
-                    String email3 = sc.next();
-                    System.out.println(platform.manageUser("", email3, null, "delete"));
-                    sc.nextLine();
-                    break;
-                case 4: // Admin - Approve music
-                    System.out.print("Approve music (title): ");
-                    String title4 = sc.nextLine();
-                    System.out.println(platform.approveMusic(title4, true));
-                    break;
-                case 5: // Artist - Upload music
-                    System.out.print("Upload music (title album): ");
-                    String title5 = sc.next(); String album5 = sc.next();
-                    String genre5 = selectGenre(sc);
-                    System.out.println(platform.uploadMusic(title5, "ArtistName", album5, genre5));
-                    sc.nextLine();
-                    break;
-                case 6: // Artist - Interact with fans
-                    System.out.print("Interact with fans - enter message: ");
-                    String msg6 = sc.nextLine();
-                    System.out.println("Interaction sent: " + msg6);
-                    break;
-                case 7: // Artist - Track music performance
-                    System.out.print("Enter music title to track performance: ");
-                    String trackTitle7 = sc.nextLine();
-                    System.out.println("Performance for " + trackTitle7 + ": Streams - 1000, Likes - 500");
-                    break;
-                case 8: // Listener - Stream music
-                    System.out.print("Stream music (title): ");
-                    String title8 = sc.nextLine();
-                    System.out.println(platform.streamMusic(title8));
-                    break;
-                case 9: // Listener - Create playlist
-                    System.out.print("Create playlist (title): ");
-                    String playlistTitle9 = sc.nextLine();
-                    Playlist p9 = platform.createPlaylist(playlistTitle9);
-                    System.out.print("Add music to playlist (title): ");
-                    String songTitle9 = sc.nextLine();
-                    for (Music m : platform.musicContents)
-                        if (m.title.equals(songTitle9)) { p9.addSong(m); break; }
-                    System.out.println("Added " + songTitle9 + " to playlist " + playlistTitle9);
-                    break;
-                case 10: // Listener - Add music to playlist
-                    System.out.print("Enter playlist title: ");
-                    String plTitle10 = sc.nextLine();
-                    System.out.print("Enter music title to add: ");
-                    String songTitle10 = sc.nextLine();
-                    for (Playlist plist : platform.playlists) {
-                        if (plist.title.equals(plTitle10)) {
-                            for (Music m : platform.musicContents) {
-                                if (m.title.equals(songTitle10)) {
-                                    plist.addSong(m);
-                                    System.out.println("Added " + songTitle10 + " to playlist " + plTitle10);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case 11: // Listener - Follow artist
-                    System.out.print("Follow artist (name): ");
-                    String aName11 = sc.nextLine();
-                    System.out.println(platform.followArtist(aName11));
-                    break;
-                default: System.out.println("Invalid option!");
-            }
+    <!-- 4. Approve music -->
+    <div id="sec4" class="card feature-section hidden">
+        <div class="section-title">Approve Music</div>
+        <input type="text" placeholder="Enter Music Title">
+        <button>Approve</button>
+    </div>
 
-            // Show added music and playlists after each round for easy debugging
-            System.out.println("\nCurrent Music List:");
-            platform.showMusic();
-            System.out.println("\nCurrent Playlists:");
-            platform.showPlaylists();
-        }
-        System.out.println("Exited. Thank you!");
-        sc.close();
-    }
-} give me a ui ux code in html for above code
+    <!-- 5. Upload music -->
+    <div id="sec5" class="card feature-section hidden">
+        <div class="section-title">Upload Music</div>
+        <input type="text" placeholder="Enter Title">
+        <input type="text" placeholder="Enter Album">
+
+        <label>Select Genre:</label>
+        <select>
+            <option>Pop</option><option>Rock</option><option>Hip Hop</option>
+            <option>Jazz</option><option>Classical</option><option>Electronic</option>
+            <option>R&B</option><option>Country</option><option>Blues</option>
+            <option>Reggae</option><option>Metal</option><option>Folk</option>
+            <option>Soul</option><option>Funk</option><option>EDM</option>
+            <option>Indie</option><option>Bollywood</option><option>World</option>
+            <option>Gospel</option>
+        </select>
+
+        <button>Upload Music</button>
+    </div>
+
+    <!-- 6. Interact with fans -->
+    <div id="sec6" class="card feature-section hidden">
+        <div class="section-title">Interact with Fans</div>
+        <textarea placeholder="Enter message to fans"></textarea>
+        <button>Send</button>
+    </div>
+
+    <!-- 7. Music performance -->
+    <div id="sec7" class="card feature-section hidden">
+        <div class="section-title">Track Performance</div>
+        <input type="text" placeholder="Enter Music Title">
+        <button>Track Performance</button>
+    </div>
+
+    <!-- 8. Stream music -->
+    <div id="sec8" class="card feature-section hidden">
+        <div class="section-title">Stream Music</div>
+        <input type="text" placeholder="Enter Title">
+        <button>Stream</button>
+    </div>
+
+    <!-- 9. Create playlist -->
+    <div id="sec9" class="card feature-section hidden">
+        <div class="section-title">Create Playlist</div>
+        <input type="text" placeholder="Playlist Title">
+        <input type="text" placeholder="Add Song Title">
+        <button>Create Playlist</button>
+    </div>
+
+    <!-- 10. Add music to playlist -->
+    <div id="sec10" class="card feature-section hidden">
+        <div class="section-title">Add Music to Playlist</div>
+        <input type="text" placeholder="Playlist Title">
+        <input type="text" placeholder="Music Title">
+        <button>Add</button>
+    </div>
+
+    <!-- 11. Follow artist -->
+    <div id="sec11" class="card feature-section hidden">
+        <div class="section-title">Follow Artist</div>
+        <input type="text" placeholder="Artist Name">
+        <button>Follow</button>
+    </div>
+
+</div>
+
+</body>
+</html>
